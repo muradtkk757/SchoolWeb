@@ -1,6 +1,7 @@
-﻿using Academy.BLL.Mapping;
+using Academy.BLL.Mapping;
 using Academy.BLL.Services.Implementations;
 using Academy.BLL.Services.Interfaces;
+using Core.Application;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,9 @@ namespace Academy.BLL
             }); 
             services.AddScoped(typeof(ICrudServiceAsync<,,,>), typeof(CrudManager<,,,>));
             services.AddScoped<IGroupService, GroupManager>();
+            services.AddScoped<IAuthService, AuthManager>();
+
+            services.AddApplication();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Academy.BLL.DTOs;
 using Academy.BLL.Services.Interfaces;
 using Core.Persistence.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace Academy.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class GroupsController : ControllerBase
     {
         private readonly IGroupService _groupService;

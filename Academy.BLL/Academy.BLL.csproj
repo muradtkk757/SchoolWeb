@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Academy.DAL\Academy.DAL.csproj" />
     <ProjectReference Include="..\Core.Persistence\Core.Persistence.csproj" />
+    <ProjectReference Include="..\Core.Application\Core.Application.csproj" />
   </ItemGroup>
 
 </Project>

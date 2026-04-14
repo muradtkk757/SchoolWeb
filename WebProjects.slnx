@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/" />
   <Folder Name="/src/core/">
+    <Project Path="Core.Application/Core.Application.csproj" Id="24bbe0ac-8afb-48db-a287-af3dd8e076b4" />
     <Project Path="Core.Persistence/Core.Persistence.csproj" />
   </Folder>
   <Folder Name="/src/projects/" />
