@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/core/">
+    <Project Path="Core.Persistence/Core.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/src/projects/" />
+  <Folder Name="/src/projects/academy/">
+    <Project Path="Academy.API/Academy.API.csproj" />
+    <Project Path="Academy.BLL/Academy.BLL.csproj" />
+    <Project Path="Academy.DAL/Academy.DAL.csproj" />
+  </Folder>
+</Solution>
