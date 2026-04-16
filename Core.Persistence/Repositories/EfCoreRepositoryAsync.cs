@@ -30,9 +30,16 @@ namespace Core.Persistence.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public virtual async Task<IEnumerable<T>> GetAllAsync()
+        public virtual async Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
         {
-            var result = await _context.Set<T>().AsNoTracking().ToListAsync();
+            IQueryable<T> query = _context.Set<T>().AsNoTracking();
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            var result = await query.ToListAsync();
 
             return result;
         }

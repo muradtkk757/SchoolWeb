@@ -5,12 +5,18 @@ using System.Text;
 
 namespace Academy.BLL.DTOs
 {
+    public class GroupStudentDto
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+    }
+
     public class GroupDto : Dto
     {
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? TeacherName { get; set; }
-        public IEnumerable<(int, string)> Students { get; set; } = [];
+        public IEnumerable<GroupStudentDto> Students { get; set; } = [];
         public IEnumerable<AttendanceDto> Attendances { get; set; } = [];
     }
 

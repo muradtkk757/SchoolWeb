@@ -14,6 +14,7 @@ namespace Academy.BLL.Mapping
         {
             CreateMap<Student, StudentDto>()
                 .ForMember(dest => dest.GroupName, opt => opt.MapFrom(src => src.Group.Name));
+            CreateMap<Student, GroupStudentDto>();
             CreateMap<CreateStudentDto, Student>().ReverseMap();
             CreateMap<UpdateStudentDto, Student>().ReverseMap();
             CreateMap<PaginatedResult<Student>, PaginatedResultDto<StudentDto>>();
@@ -32,7 +33,8 @@ namespace Academy.BLL.Mapping
              CreateMap<PaginatedResult<Attendance>, PaginatedResultDto<AttendanceDto>>();
 
             CreateMap<Group, GroupDto>()
-                .ForMember(dest => dest.TeacherName, opt => opt.MapFrom(src => src.Teacher.Name))
+                .ForMember(dest => dest.TeacherName, opt => opt.MapFrom(src => src.Teacher != null ? src.Teacher.Name : null))
+                //.ForMember(dest => dest.Students, opt => opt.MapFrom(src => src.Students))
                 .ReverseMap();
             CreateMap<CreateGroupDto, Group>().ReverseMap();
             CreateMap<UpdateGroupDto, GroupDto>().ReverseMap();

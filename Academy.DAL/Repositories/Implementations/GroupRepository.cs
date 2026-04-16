@@ -2,6 +2,7 @@
 using Academy.DAL.DataContext.Entities;
 using Academy.DAL.Repositories.Interfaces;
 using Core.Persistence.Repositories;
+using System.Linq.Expressions;
 
 namespace Academy.DAL.Repositories.Implementations
 {
@@ -9,6 +10,11 @@ namespace Academy.DAL.Repositories.Implementations
     {
         public GroupRepository(AcademyDbContext context) : base(context)
         {
+        }
+
+        public override async Task<IEnumerable<Group>> GetAllAsync(params Expression<Func<Group, object>>[] includes)
+        {
+            return await base.GetAllAsync(g => g.Students);
         }
     }
 }

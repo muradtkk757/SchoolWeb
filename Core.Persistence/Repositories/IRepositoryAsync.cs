@@ -11,7 +11,7 @@ namespace Core.Persistence.Repositories
     {
         Task<T> GetByIdAsync(int id);
         Task<T> GetAsync(Expression<Func<T, bool>> predicate);  
-        Task<IEnumerable<T>> GetAllAsync();
+        Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object>>[] includes);
         Task<PaginatedResult<T>> GetListAsync(PageRequest pageRequest);
         Task AddAsync(T entity);
         Task UpdateAsync(T entity);
