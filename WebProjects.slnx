@@ -9,5 +9,6 @@
     <Project Path="Academy.API/Academy.API.csproj" />
     <Project Path="Academy.BLL/Academy.BLL.csproj" />
     <Project Path="Academy.DAL/Academy.DAL.csproj" />
+    <Project Path="Academy.MVC/Academy.MVC.csproj" Id="13a0c340-4bdc-4f1e-b460-af1c683083ad" />
   </Folder>
 </Solution>
