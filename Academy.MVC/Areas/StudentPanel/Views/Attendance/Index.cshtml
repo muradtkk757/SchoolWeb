@@ -1,0 +1,92 @@
+@model IEnumerable<Academy.BLL.DTOs.AttendanceDto>
+@{
+    ViewData["Title"] = "My Attendance";
+}
+
+<div class="row align-items-center mb-4 pb-2 border-bottom border-light">
+    <div class="col-md-8">
+        <h2 class="display-6 fw-bold text-dark mb-1">Welcome back, @ViewBag.StudentName ??</h2>
+        <p class="text-muted fw-medium fs-5">Here's your attendance overview for this semester.</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-5 bg-success bg-opacity-10 text-center p-4">
+            <div class="display-3 fw-bold text-success mb-2">@ViewBag.PresenceCount</div>
+            <h5 class="text-success fw-bold text-uppercase tracking-wider">Days Present</h5>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-5 bg-danger bg-opacity-10 text-center p-4">
+            <div class="display-3 fw-bold text-danger mb-2">@ViewBag.AbsenceCount</div>
+            <h5 class="text-danger fw-bold text-uppercase tracking-wider">Days Absent</h5>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-5 bg-warning bg-opacity-10 text-center p-4">
+            <div class="display-3 fw-bold text-warning mb-2 text-dark">@ViewBag.LateCount</div>
+            <h5 class="text-warning text-dark fw-bold text-uppercase tracking-wider">Times Late</h5>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-5 overflow-hidden mt-4">
+    <div class="card-header bg-white border-bottom border-light px-4 py-4 d-flex justify-content-between align-items-center">
+        <h4 class="fw-bold text-dark mb-0 d-flex align-items-center">
+            <i class="bi bi-journal-bookmark-fill text-success me-3 fs-3"></i> Full Attendance History
+        </h4>
+        <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill shadow-sm"><i class="bi bi-funnel me-1"></i> All Records</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-secondary">
+                    <tr>
+                        <th class="ps-4 py-3">Date</th>
+                        <th class="py-3">Group Enrolled</th>
+                        <th class="text-end pe-4 py-3">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var record in Model)
+                        {
+                            var statusClass = record.AttendanceStatus == "Present" ? "bg-success" :
+                                              record.AttendanceStatus == "Absent" ? "bg-danger" :
+                                              record.AttendanceStatus == "Late" ? "bg-warning text-dark" : "bg-info text-dark";
+                            <tr>
+                                <td class="ps-4 fw-semibold text-secondary py-4">
+                                    <i class="bi bi-calendar-event text-secondary me-2 fs-5"></i>@record.Date.ToString("dd MMMM yyyy, dddd")
+                                </td>
+                                <td class="fw-bold text-dark py-4"><span class="badge bg-light text-dark border px-3 py-2 rounded-pill fs-6 shadow-sm">@record.GroupName</span></td>
+                                <td class="text-end pe-4 py-4">
+                                    <span class="badge @statusClass rounded-pill shadow-sm px-4 py-2 fs-6 fw-bold d-inline-flex align-items-center">
+                                        @if(record.AttendanceStatus == "Present") { <i class="bi bi-check-circle-fill me-2"></i> }
+                                        else if(record.AttendanceStatus == "Absent") { <i class="bi bi-x-circle-fill me-2"></i> }
+                                        @record.AttendanceStatus
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-5 my-5">
+                                <i class="bi bi-clipboard-x fs-1 text-muted opacity-25 mb-3 d-block"></i>
+                                <h5 class="fw-bold text-secondary">No Records Found</h5>
+                                <p class="mb-0">Your teacher hasn't recorded any attendance yet.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .tracking-wider { letter-spacing: 0.1em; }
+</style>

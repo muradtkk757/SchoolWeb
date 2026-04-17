@@ -37,9 +37,12 @@ namespace Academy.MVC.Controllers
                     var jwtToken = handler.ReadJwtToken(response.Token);
                     var roleClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "role" || c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
 
-                    if (roleClaim != null && roleClaim.Value == "Teacher")
+                    if (roleClaim != null)
                     {
-                        return RedirectToAction("Index", "Group", new { area = "TeacherPanel" });
+                        if (roleClaim.Value == "Teacher")
+                            return RedirectToAction("Index", "Group", new { area = "TeacherPanel" });
+                        else if (roleClaim.Value == "Student")
+                            return RedirectToAction("Index", "Attendance", new { area = "StudentPanel" });
                     }
                     
                     return RedirectToAction("Index", "Home");

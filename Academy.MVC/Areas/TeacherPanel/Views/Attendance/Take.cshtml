@@ -1,0 +1,129 @@
+@using Academy.BLL.DTOs
+@model IEnumerable<GroupStudentDto>
+
+@{
+    ViewData["Title"] = "Take Attendance";
+}
+
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h2 class="display-6 fw-bold text-dark mb-1">Take Attendance</h2>
+        <p class="text-muted fw-medium d-flex align-items-center">
+            <span class="badge bg-primary text-white me-2 px-3 py-1 rounded-pill">Class @ViewBag.GroupName</span>
+            Record today's attendance for the selected group.
+        </p>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill border border-secondary border-opacity-50 fw-semibold px-4 shadow-sm hover-lift">
+            <i class="bi bi-arrow-left me-2"></i>Back to Groups
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden mt-4">
+    <div class="card-header bg-white border-bottom border-light px-4 py-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold text-dark mb-0 d-flex align-items-center">
+            <i class="bi bi-calendar-event text-primary me-3 fs-4"></i> Attendance Sheet
+        </h5>
+        <div>
+            <span class="badge bg-light text-dark border border-secondary border-opacity-25 px-3 py-2 rounded-pill fw-semibold">
+                <i class="bi bi-calendar3 me-1"></i> @DateTime.Now.ToString("dd MMM yyyy")
+            </span>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <form asp-action="Submit" method="post" id="attendanceForm">
+            <input type="hidden" name="groupId" value="@ViewBag.GroupId" />
+            <input type="hidden" name="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-secondary">
+                        <tr>
+                            <th class="ps-4">Student Name</th>
+                            <th class="text-center" style="width: 15%">Present</th>
+                            <th class="text-center" style="width: 15%">Absent</th>
+                            <th class="text-center" style="width: 15%">Late</th>
+                            <th class="text-center pe-4" style="width: 15%">Excused</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var student in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-semibold text-dark d-flex align-items-center py-3">
+                                    <div class="bg-light rounded-circle shadow-sm border border-secondary border-opacity-25 d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-person-fill text-secondary fs-5"></i>
+                                    </div>
+                                    @student.Name
+                                </td>
+                                <td class="text-center">
+                                    <div class="form-check d-flex justify-content-center m-0">
+                                        <input class="form-check-input form-check-input-lg border-success cursor-pointer" type="radio" 
+                                               name="statuses[@student.Id]" value="Present" checked required>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="form-check d-flex justify-content-center m-0">
+                                        <input class="form-check-input form-check-input-lg border-danger cursor-pointer" type="radio" 
+                                               name="statuses[@student.Id]" value="Absent">
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="form-check d-flex justify-content-center m-0">
+                                        <input class="form-check-input form-check-input-lg border-warning cursor-pointer" type="radio" 
+                                               name="statuses[@student.Id]" value="Late">
+                                    </div>
+                                </td>
+                                <td class="text-center pe-4">
+                                    <div class="form-check d-flex justify-content-center m-0">
+                                        <input class="form-check-input form-check-input-lg border-info cursor-pointer" type="radio" 
+                                               name="statuses[@student.Id]" value="Excused">
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="card-footer bg-light p-4 text-end border-top border-light">
+                <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm hover-lift">
+                    <i class="bi bi-cloud-arrow-up-fill me-2"></i> Save Attendance
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-check-input-lg {
+        width: 1.5em;
+        height: 1.5em;
+        margin-top: 0;
+    }
+    
+    .form-check-input:checked[value="Present"] {
+        background-color: #198754;
+        border-color: #198754;
+    }
+    
+    .form-check-input:checked[value="Absent"] {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+    
+    .form-check-input:checked[value="Late"] {
+        background-color: #ffc107;
+        border-color: #ffc107;
+    }
+    
+    .form-check-input:checked[value="Excused"] {
+        background-color: #0dcaf0;
+        border-color: #0dcaf0;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>

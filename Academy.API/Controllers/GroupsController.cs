@@ -1,9 +1,8 @@
 ﻿using Academy.BLL.DTOs;
 using Academy.BLL.Services.Interfaces;
 using Core.Persistence.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Academy.API.Controllers
@@ -38,7 +37,10 @@ namespace Academy.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetGroupById(int id)
         {
-            var group = await _groupService.GetByIdAsync(id);
+            // By default CrudManager GetByIdAsync might not apply Includes. 
+            // Better to pull from GetAllWithDetails and filter.
+            var groups = await _groupService.GetAllWithDetailsAsync();
+            var group = groups.FirstOrDefault(g => g.Id == id);
 
             if (group == null)
             {

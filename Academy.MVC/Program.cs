@@ -35,6 +35,11 @@ app.MapControllerRoute(
     pattern: "{area:exists}/{controller=Group}/{action=Index}/{id?}"
 );
 
+app.MapControllerRoute(
+    name: "studentArea",
+    pattern: "{area:exists}/{controller=Attendance}/{action=Index}/{id?}"
+);
+
 // Default routing
 app.MapControllerRoute(
     name: "default",
