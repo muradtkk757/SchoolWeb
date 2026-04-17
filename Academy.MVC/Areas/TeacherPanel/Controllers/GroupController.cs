@@ -28,11 +28,10 @@ namespace Academy.MVC.Areas.TeacherPanel.Controllers
                     return RedirectToAction("Index", "Home", new { area = "" });
                 }
 
-                // Tokendən istifadəçi adını çıxarırıq
+                // Tokendən istifadəçi İD-sini (AppUserId) çıxarırıq
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(token);
-                var usernameClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier || c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
-                var usernameClaimName = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name");
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
                 
                 var groups = await _apiClient.GetAsync<List<GroupDto>>("api/groups");
 
@@ -42,12 +41,28 @@ namespace Academy.MVC.Areas.TeacherPanel.Controllers
                     return View(Enumerable.Empty<GroupDto>());
                 }
 
-                // Yalnız hesaba daxil olan müəllimin qruplarını filter edirik.
-                // Token-də userName (NameClaim) gəlir. Teacher adı ilə eyni olduğuna fərz edərək:
-                if (usernameClaimName != null)
+                if (userIdClaim != null)
                 {
-                    var username = usernameClaimName.Value;
-                    groups = groups.Where(g => g.TeacherName != null && g.TeacherName.Equals(username, StringComparison.OrdinalIgnoreCase)).ToList();
+                    var userId = userIdClaim.Value;
+                    
+                    // Müəllimlərin siyahısını cəkirik ki, AppUserId-yə əsasən Teacher obyektini tapaq
+                    var teachers = await _apiClient.GetAsync<List<TeacherDto>>("api/teachers");
+                    var currentTeacher = teachers?.FirstOrDefault(t => t.AppUserId == userId);
+
+                    if (currentTeacher != null && currentTeacher.Name != null)
+                    {
+                        // Qrupları tapılan müəllimin "Name" (Ad-Soyad) məlumatına görə filter edirik
+                        groups = groups.Where(g => g.TeacherName != null && g.TeacherName.Equals(currentTeacher.Name, StringComparison.OrdinalIgnoreCase)).ToList();
+                    }
+                    else
+                    {
+                        // Əgər istifadəçiyə uyğun teacher tapılmadısa, boş siyahı göstərsin
+                        groups = new List<GroupDto>();
+                    }
+                }
+                else
+                {
+                    groups = new List<GroupDto>();
                 }
 
                 return View(groups);

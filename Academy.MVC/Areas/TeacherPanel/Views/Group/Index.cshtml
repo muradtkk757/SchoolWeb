@@ -1,80 +1,142 @@
-﻿
-@model IEnumerable<Academy.BLL.DTOs.GroupDto>
+﻿@model IEnumerable<Academy.BLL.DTOs.GroupDto>
 
 @{
-    ViewData["Title"] = "Groups";
+    ViewData["Title"] = "My Groups";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">Groups</h2>
-    <span class="badge text-bg-dark px-3 py-2">Total: @Model.Count()</span>
-</div>
-
-@if (ViewBag.Error != null)
-{
-    <div class="alert alert-warning" role="alert">
-        @ViewBag.Error
+<div class="container py-5">
+    <div class="row align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold text-primary mb-1">
+                <i class="bi bi-briefcase-fill me-2 text-warning"></i> My Classes
+            </h1>
+            <p class="lead text-muted mb-0">Manage your active groups and assigned students</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <div class="d-inline-block bg-white p-3 rounded-4 shadow-sm border border-light">
+                <div class="text-uppercase text-muted small fw-bold mb-1">Total Groups</div>
+                <div class="fs-2 fw-bolder text-dark lh-1">@Model.Count()</div>
+            </div>
+        </div>
     </div>
-}
 
-<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="table-dark">
-                <tr>
-                    <th class="ps-4">#</th>
-                    <th>Group Name</th>
-                    <th class="text-end pe-4">Students</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Any())
-                {
-                    foreach (var group in Model)
-                    {
-                        var studentCount = group.Students.Count();
-                        var collapseId = $"students-{group.Id}";
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger shadow-sm rounded-4 border-0 mb-4 d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-4 me-3 text-danger"></i>
+            <div>
+                <h5 class="alert-heading fw-bold mb-1">Oops, something went wrong!</h5>
+                <p class="mb-0">@ViewBag.Error</p>
+            </div>
+        </div>
+    }
 
-                        <tr>
-                            <td class="ps-4 fw-semibold">@group.Id</td>
-                            <td>@group.Name</td>
-                            <td class="text-end pe-4">
-                                <span class="badge rounded-pill text-bg-secondary me-2">@studentCount</span>
-                                <button class="btn btn-sm btn-outline-dark rounded-pill px-3"
-                                        type="button"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#@collapseId"
-                                        aria-expanded="false"
-                                        aria-controls="@collapseId">
-                                    View Students
-                                </button>
-                                <div class="collapse mt-3 text-start" id="@collapseId">
-                                    @if (studentCount > 0)
+    @if (!Model.Any() && ViewBag.Error == null)
+    {
+        <div class="text-center py-5 bg-white rounded-5 shadow-sm border border-light mt-4">
+            <div class="display-1 text-muted mb-3 opacity-25">
+                <i class="bi bi-inbox"></i>
+            </div>
+            <h3 class="fw-bold text-dark">No Groups Assigned</h3>
+            <p class="text-muted fs-5 mb-0">You currently don't have any classes assigned to you.</p>
+            <p class="text-muted small">Contact the administration to get assigned to a new group.</p>
+            <img src="https://illustrations.popsy.co/amber/student-going-to-school.svg" class="img-fluid mt-4" style="max-height: 250px; opacity: 0.8;" alt="No groups" />
+        </div>
+    }
+    else if (Model.Any())
+    {
+        <div class="row row-cols-1 row-cols-lg-2 g-4 mt-1">
+            @foreach (var group in Model)
+            {
+                var studentCount = group.Students?.Count() ?? 0;
+                var collapseId = $"students-{group.Id}";
+                var progressValue = studentCount == 0 ? 0 : Math.Min(100, (studentCount * 100) / 20); //Assuming 20 is max
+                var progressColor = progressValue > 80 ? "bg-danger" : progressValue > 50 ? "bg-warning" : "bg-success";
+
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm rounded-5 hover-lift transition-all user-select-none">
+                        <div class="card-body p-4 position-relative overflow-hidden">
+                            <!-- Background decoration -->
+                            <div class="position-absolute top-0 end-0 opacity-10 p-3" style="transform: translate(25%, -25%) scale(1.5);">
+                                <i class="bi bi-people-fill text-primary" style="font-size: 8rem;"></i>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-start mb-3 position-relative z-1">
+                                <div>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary mb-2 px-3 py-2 rounded-pill fw-semibold border border-primary border-opacity-10">ID: #@group.Id</span>
+                                    <h3 class="card-title fw-bold text-dark mb-1">@group.Name</h3>
+                                </div>
+                                <div class="text-center">
+                                    <div class="d-flex align-items-center justify-content-center bg-light rounded-circle shadow-sm" style="width: 55px; height: 55px;">
+                                        <h3 class="mb-0 fw-bold text-primary">@studentCount</h3>
+                                    </div>
+                                    <small class="text-muted fw-semibold mt-1 d-block" style="font-size: 0.75rem;">STUDENTS</small>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 position-relative z-1">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small class="text-muted fw-bold">Class Capacity</small>
+                                    <small class="text-muted fw-bold">@studentCount / 20</small>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar @progressColor rounded-pill" role="progressbar" style="width: @progressValue%" aria-valuenow="@progressValue" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white border-0 p-4 pt-0">
+                            <button class="btn btn-outline-primary w-100 rounded-pill py-2 fw-semibold d-flex align-items-center justify-content-center" 
+                                    type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#@collapseId" 
+                                    aria-expanded="false" 
+                                    aria-controls="@collapseId">
+                                <i class="bi bi-person-lines-fill me-2"></i> View Students List
+                            </button>
+                            
+                            <div class="collapse mt-3" id="@collapseId">
+                                <div class="card card-body bg-light border-0 rounded-4">
+                                    @if (studentCount > 0 && group.Students != null)
                                     {
-                                        <div class="d-flex flex-wrap gap-2 justify-content-end">
+                                        <h6 class="text-uppercase text-muted fw-bold mb-3 small d-flex align-items-center">
+                                            <i class="bi bi-list-check me-2"></i> Enrolled Students
+                                        </h6>
+                                        <div class="d-flex flex-wrap gap-2">
                                             @foreach (var student in group.Students)
                                             {
-                                                <span class="badge rounded-pill text-bg-dark px-3 py-2">@student.Name</span>
+                                                <span class="badge bg-white text-dark shadow-sm px-3 py-2 border rounded-pill d-flex align-items-center">
+                                                    <i class="bi bi-person-circle text-secondary me-2"></i> @student.Name
+                                                </span>
                                             }
                                         </div>
                                     }
                                     else
                                     {
-                                        <span class="text-muted">No students assigned to this group yet.</span>
+                                        <div class="text-center py-3">
+                                            <i class="bi bi-person-x text-muted fs-3 mb-2 d-block"></i>
+                                            <span class="text-muted small">No students are currently enrolled in this class.</span>
+                                        </div>
                                     }
                                 </div>
-                            </td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="3" class="text-center text-muted py-4">No groups found.</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>
+
+<!-- Add custom styles for hover effects -->
+<style>
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important;
+    }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
