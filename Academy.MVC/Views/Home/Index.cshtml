@@ -1,8 +1,74 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Academy Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    <!-- Header Section -->
+    <div class="row align-items-center mb-5 border-bottom pb-4">
+        <div class="col-md-8">
+            <h1 class="display-4 fw-bold text-primary">
+                <i class="bi bi-building"></i> Welcome to Future Academy
+            </h1>
+            <p class="lead text-muted">Empowering students for a better tomorrow through quality education.</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body">
+                    <h5 class="card-title mb-3"><i class="bi bi-person-circle"></i> User Portal</h5>
+                    
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger p-2 mb-2" role="alert">
+                            @TempData["ErrorMessage"]
+                        </div>
+                    }
+
+                    <!-- Login Form -->
+                    <form asp-controller="Account" asp-action="Login" method="post">
+                        <div class="mb-2">
+                            <input type="text" name="Username" class="form-control" placeholder="Username" required />
+                        </div>
+                        <div class="mb-2">
+                            <input type="password" name="Password" class="form-control" placeholder="Password" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row text-center mt-5">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h1 class="text-info mb-3"><i class="bi bi-book"></i></h1>
+                    <h3 class="h5">Quality Education</h3>
+                    <p class="text-muted">Our expert teachers provide top-notch education tailored to your needs.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h1 class="text-success mb-3"><i class="bi bi-people"></i></h1>
+                    <h3 class="h5">Vibrant Community</h3>
+                    <p class="text-muted">Join a diverse community of students and educators striving for excellence.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h1 class="text-warning mb-3"><i class="bi bi-laptop"></i></h1>
+                    <h3 class="h5">Modern Facilities</h3>
+                    <p class="text-muted">Learn in a modern environment equipped with the latest technology.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Add Bootstrap Icons (Add to _Layout.cshtml ideally, but placed here for now) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
