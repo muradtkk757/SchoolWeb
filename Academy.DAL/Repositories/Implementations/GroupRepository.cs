@@ -14,7 +14,7 @@ namespace Academy.DAL.Repositories.Implementations
 
         public override async Task<IEnumerable<Group>> GetAllAsync(params Expression<Func<Group, object>>[] includes)
         {
-            return await base.GetAllAsync(g => g.Students);
+            return await base.GetAllAsync(g => g.Students, g => g.Teacher);
         }
     }
 }

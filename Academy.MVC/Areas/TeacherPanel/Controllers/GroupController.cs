@@ -3,6 +3,10 @@ using Academy.MVC.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System;
 
 namespace Academy.MVC.Areas.TeacherPanel.Controllers
 {
@@ -20,57 +24,63 @@ namespace Academy.MVC.Areas.TeacherPanel.Controllers
         {
             try
             {
-                // Cookie-dən tokeni götürürük
                 var token = Request.Cookies["AuthToken"];
-                
                 if (string.IsNullOrEmpty(token))
                 {
                     return RedirectToAction("Index", "Home", new { area = "" });
                 }
 
-                // Tokendən istifadəçi İD-sini (AppUserId) çıxarırıq
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(token);
-                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
                 
-                var groups = await _apiClient.GetAsync<List<GroupDto>>("api/groups");
+                var userNameClaim = jwtToken.Claims.FirstOrDefault(c => 
+                    c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name");
 
-                if (groups is null)
+                var userName = userNameClaim?.Value;
+                
+                var allGroups = await _apiClient.GetAsync<List<GroupDto>>("api/groups") ?? new List<GroupDto>();
+                
+                if (string.IsNullOrEmpty(userName))
                 {
-                    ViewBag.Error = "Could not load groups from API.";
-                    return View(Enumerable.Empty<GroupDto>());
+                    ViewBag.Error = "Token içindən istifadəçi adı (username) tapılmadı.";
+                    return View(allGroups);
+                }
+                
+                var teachers = await _apiClient.GetAsync<List<TeacherDto>>("api/teachers");
+                
+                TeacherDto? currentTeacher = null;
+                if (teachers != null)
+                {
+                    currentTeacher = teachers.FirstOrDefault(t => 
+                        (t.Name != null && t.Name.Replace(" ", "").ToLower() == userName.ToLower()) ||
+                        userName.ToLower().Contains(t.Name?.Replace(" ", "").ToLower() ?? "")
+                    );
                 }
 
-                if (userIdClaim != null)
+                if (currentTeacher != null)
                 {
-                    var userId = userIdClaim.Value;
-                    
-                    // Müəllimlərin siyahısını cəkirik ki, AppUserId-yə əsasən Teacher obyektini tapaq
-                    var teachers = await _apiClient.GetAsync<List<TeacherDto>>("api/teachers");
-                    var currentTeacher = teachers?.FirstOrDefault(t => t.AppUserId == userId);
+                    // Artıq API-dən gələn siyahıda TeacherName var, sadəcə filter edirik:
+                    var myGroups = allGroups.Where(g => 
+                        !string.IsNullOrEmpty(g.TeacherName) && 
+                        g.TeacherName.Equals(currentTeacher.Name, StringComparison.OrdinalIgnoreCase)
+                    ).ToList();
 
-                    if (currentTeacher != null && currentTeacher.Name != null)
+                    // Əgər həqiqətən bu müəllimə qrup təyin olunmayıbsa
+                    if (!myGroups.Any())
                     {
-                        // Qrupları tapılan müəllimin "Name" (Ad-Soyad) məlumatına görə filter edirik
-                        groups = groups.Where(g => g.TeacherName != null && g.TeacherName.Equals(currentTeacher.Name, StringComparison.OrdinalIgnoreCase)).ToList();
+                        ViewBag.Error = null; // Əvvəlki "Teacher null" xətanı sildik, artıq sistem işləyir, sadəcə qrup yoxdur.
                     }
-                    else
-                    {
-                        // Əgər istifadəçiyə uyğun teacher tapılmadısa, boş siyahı göstərsin
-                        groups = new List<GroupDto>();
-                    }
-                }
-                else
-                {
-                    groups = new List<GroupDto>();
+
+                    return View(myGroups);
                 }
 
-                return View(groups);
+                ViewBag.Error = $"Sizin istifadəçi adınıza ('{userName}') uyğun Müəllim tapılmadı.";
+                return View(allGroups); 
             }
-            catch
+            catch (Exception ex)
             {
-                ViewBag.Error = "Academy API is not reachable.";
-                return View(Enumerable.Empty<GroupDto>());
+                ViewBag.Error = $"Xəta: {ex.Message}";
+                return View(new List<GroupDto>());
             }
         }
     }

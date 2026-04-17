@@ -4,6 +4,7 @@ using Core.Persistence.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Academy.API.Controllers
 {
@@ -21,7 +22,7 @@ namespace Academy.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllGroups()
         {
-            var groups = await _groupService.GetAllAsync();
+            var groups = await _groupService.GetAllWithDetailsAsync();
 
             return Ok(groups);
         }
@@ -33,7 +34,6 @@ namespace Academy.API.Controllers
 
             return Ok(groups);
         }
-
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetGroupById(int id)
