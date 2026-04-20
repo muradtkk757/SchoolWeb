@@ -9,14 +9,21 @@ namespace Academy.DAL.Repositories.Implementations
 {
     public class AttendanceRepository : EfCoreRepositoryAsync<Attendance, AcademyDbContext>, IAttendanceRepository
     {
+        private readonly AcademyDbContext _db;
+
         public AttendanceRepository(AcademyDbContext context) : base(context)
         {
+            _db = context;
         }
 
         public override async Task<IEnumerable<Attendance>> GetAllAsync(params Expression<Func<Attendance, object>>[] includes)
         {
-            // Tələbə və onun qrupunun məlumatlarını da birlikdə çəkirik ki Dto mapping-də Name-lər null gəlməsin
-            return await base.GetAllAsync(a => a.Student, a => a.Student!.Group!);
+            // API 500 error-ların qarşısını almaq üçün birbaşa DbContext vasitəsilə təhlükəsiz (.ThenInclude) çəkirik:
+            return await _db.Attendances
+                .AsNoTracking()
+                .Include(a => a.Student)
+                    .ThenInclude(s => s.Group)
+                .ToListAsync();
         }
     }
 }
