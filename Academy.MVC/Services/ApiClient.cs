@@ -21,30 +21,42 @@ namespace Academy.MVC.Services
                 return default;
             }
 
-            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-            return await JsonSerializer.DeserializeAsync<T>(stream, new JsonSerializerOptions
+            var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            if (string.IsNullOrWhiteSpace(responseContent))
+            {
+                return default;
+            }
+
+            return JsonSerializer.Deserialize<T>(responseContent, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
-            }, cancellationToken);
+            });
         }
 
         public async Task<T?> PostAsync<T>(string requestUri, object data, CancellationToken cancellationToken = default)
         {
-            var json = JsonSerializer.Serialize(data);
+            var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync(requestUri, content, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
+                var errorBody = await response.Content.ReadAsStringAsync(cancellationToken);
+                Console.WriteLine($"API ERROR [{response.StatusCode}]: {errorBody}"); // Log error to console to debug easily
                 return default;
             }
 
-            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-            return await JsonSerializer.DeserializeAsync<T>(stream, new JsonSerializerOptions
+            var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            if (string.IsNullOrWhiteSpace(responseContent))
+            {
+                return default;
+            }
+
+            return JsonSerializer.Deserialize<T>(responseContent, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
-            }, cancellationToken);
+            });
         }
     }
 }

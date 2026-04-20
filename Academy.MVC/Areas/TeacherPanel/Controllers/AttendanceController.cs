@@ -48,7 +48,6 @@ namespace Academy.MVC.Areas.TeacherPanel.Controllers
             return View(myGroups);
         }
 
-        [HttpGet]
         public async Task<IActionResult> Take(int groupId)
         {
             var group = await _apiClient.GetAsync<GroupDto>($"api/groups/{groupId}");
@@ -67,8 +66,9 @@ namespace Academy.MVC.Areas.TeacherPanel.Controllers
             
             foreach(var status in statuses)
             {
-                // Enum Parsing
-                if (Enum.TryParse(status.Value, out AttendanceStatusDto parsedStatus))
+                // Parse correctly matching the enum int value API expects:
+                // Present=0, Absent=1, Late=2, Excused=3
+                if (Enum.TryParse(status.Value, true, out AttendanceStatusDto parsedStatus))
                 {
                     attendanceList.Add(new CreateAttendanceDto
                     {
@@ -81,14 +81,14 @@ namespace Academy.MVC.Areas.TeacherPanel.Controllers
 
             if(attendanceList.Any())
             {
-                var response = await _apiClient.PostAsync<object>("api/attendances/bulk", attendanceList);
+                // Force an explicit content object to the bulk post
+                var response = await _apiClient.PostAsync<object>("api/Attendances/bulk", attendanceList);
                 TempData["SuccessMessage"] = "Attendance successfully recorded for the selected date!";
             }
             
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet]
         public async Task<IActionResult> ViewPast(int groupId)
         {
             var allAttendances = await _apiClient.GetAsync<List<AttendanceDto>>("api/attendances") ?? new List<AttendanceDto>();

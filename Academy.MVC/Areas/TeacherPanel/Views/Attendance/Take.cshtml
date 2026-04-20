@@ -32,7 +32,7 @@
         </div>
     </div>
     <div class="card-body p-0">
-        <form asp-action="Submit" method="post" id="attendanceForm">
+        <form action="/TeacherPanel/Attendance/Submit" method="post" id="attendanceForm">
             <input type="hidden" name="groupId" value="@ViewBag.GroupId" />
             <input type="hidden" name="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
 
